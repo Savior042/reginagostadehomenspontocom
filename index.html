@@ -23,13 +23,11 @@ body{
     position:relative;
 }
 
-h1{
-    margin-bottom:20px;
-}
-
 .buttons{
     position:relative;
+    width:300px;
     height:80px;
+    margin:auto;
 }
 
 button,a{
@@ -43,14 +41,15 @@ button,a{
 #joao{
     background:#ff4d6d;
     color:black;
+    position:absolute;
+    left:0;
 }
 
 #regina{
-    position:absolute;
-    left:150px;
-    top:0;
     background:#333;
     color:white;
+    position:absolute;
+    left:150px;
 }
 
 </style>
@@ -87,9 +86,9 @@ Regina feia boboca
 const regina = document.getElementById("regina")
 const som = document.getElementById("som")
 
-regina.addEventListener("mouseover", fugir)
+regina.addEventListener("click", function(e){
 
-function fugir(){
+    e.preventDefault()
 
     som.currentTime = 0
     som.play()
@@ -100,9 +99,11 @@ function fugir(){
     const x = Math.random() * largura
     const y = Math.random() * altura
 
+    regina.style.position = "fixed"
     regina.style.left = x + "px"
     regina.style.top = y + "px"
-}
+
+})
 
 </script>
 
