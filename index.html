@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>reginagostadehomens.com</title>
+  <style>
+    :root{
+      --bg: #000;
+      --text: #fff;
+      --accent: #ff4d6d;
+      --muted: rgba(255,255,255,0.15);
+      --btn-padding: 14px 22px;
+      --btn-radius: 12px;
+      --max-width: 920px;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+      box-sizing:border-box;
+    }
+
+    .card{
+      width:100%;
+      max-width:var(--max-width);
+      text-align:center;
+      padding:40px;
+      box-sizing:border-box;
+      border-radius:14px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    header h1{
+      margin:0 0 18px 0;
+      font-size: clamp(20px, 3.8vw, 36px);
+      letter-spacing: 0.6px;
+      color:var(--text);
+      opacity:0.95;
+    }
+
+    .question{
+      margin:10px 0 28px 0;
+      font-size: clamp(18px, 2.7vw, 26px);
+      color:var(--muted);
+    }
+
+    .choices{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      position:relative;
+      min-height:80px;
+      padding:20px 10px;
+    }
+
+    a.btn, button.btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border: none;
+      cursor: pointer;
+      text-decoration:none;
+      color:var(--bg);
+      background:var(--accent);
+      padding:var(--btn-padding);
+      border-radius:var(--btn-radius);
+      font-weight:600;
+      font-size:16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      transition: transform 220ms cubic-bezier(.2,.9,.3,1), box-shadow 160ms;
+      user-select:none;
+    }
+    a.btn:active, button.btn:active { transform: translateY(1px) scale(0.995); }
+
+    /* Regina button special styling */
+    #reginaBtn{
+      background:transparent;
+      color:var(--text);
+      border:2px solid rgba(255,255,255,0.06);
+      background-image: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      min-width:220px;
+      position: absolute; /* will be positioned by script initially */
+      transition: transform 420ms cubic-bezier(.2,.9,.3,1), left 420ms, top 420ms;
+      z-index: 50;
+      white-space:nowrap;
+    }
+
+    /* João anchor positioned as a normal inline control area center */
+    .static-area{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:18px;
+      flex-wrap:wrap;
+      min-width:260px;
+      z-index:10;
+    }
+
+    footer{
+      margin-top:26px;
+      font-size:12px;
+      color:rgba(255,255,255,0.12);
+    }
+
+    @media (max-width:600px){
+      .card{ padding:28px; }
+      #reginaBtn{ min-width:160px; padding:10px 14px; }
+      a.btn{ padding:10px 14px; font-size:15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="card" role="main" aria-labelledby="siteTitle">
+      <header>
+        <h1 id="siteTitle">reginagostadehomens.com</h1>
+      </header>
+
+      <p class="question"><strong>Quem ama mais?</strong></p>
+
+      <div class="choices" id="choicesArea" aria-live="polite">
+        <div class="static-area" id="leftArea">
+          <a class="btn" id="joaoBtn" href="https://www.youtube.com/shorts/JwtOuNhjV7E" target="_blank" rel="noopener noreferrer" aria-label="Abrir vídeo do João em nova aba">
+            João
+          </a>
+        </div>
+
+        <!-- Regina button will be absolutely positioned via JS -->
+        <button class="btn" id="reginaBtn" aria-label="Regina feia boboca (tente clicar)">
+          Regina feia boboca
+        </button>
+      </div>
+
+      <footer>Toque João pra abrir; tente clicar na Regina (ela some e toca um som).</footer>
+
+      <!-- Audio: coloque o arquivo na mesma pasta do HTML com esse nome (ou ajuste o src) -->
+      <audio id="teleportSound" preload="auto">
+        <source src="Zé da Manga - Sound Effects BR [t3-ldLXBNsg].mp3" type="audio/mpeg">
+        <!-- fallback: se você preferir um nome simples, altere o src acima para "zedamanga.mp3" -->
+      </audio>
+    </main>
+  </div>
+
+  <script>
+    (function(){
+      const regBtn = document.getElementById('reginaBtn');
+      const area = document.getElementById('choicesArea');
+      const audio = document.getElementById('teleportSound');
+
+      // Inicialmente posiciona o botão Regina ao centro-direita do container
+      function placeInitial(){
+        const rect = area.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
+
+        // coloca à direita, vertical central
+        const left = rect.left + Math.min(w * 0.72, window.innerWidth - 140);
+        const top = rect.top + h/2 - 24;
+        regBtn.style.left = Math.max(8, left) + 'px';
+        regBtn.style.top = Math.max(8, top) + 'px';
+      }
+
+      // Gera posição aleatória dentro da viewport garantindo distância do ponto (cx,cy)
+      function randomPositionAway(cx, cy, elWidth, elHeight){
+        const padding = 12;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        const minDist = Math.max(220, Math.min(vw, vh) * 0.25); // distância mínima desejada
+
+        for(let tries=0; tries<50; tries++){
+          const left = Math.floor(Math.random() * (vw - elWidth - padding*2)) + padding;
+          const top  = Math.floor(Math.random() * (vh - elHeight - padding*2)) + padding;
+
+          const dx = (left + elWidth/2) - cx;
+          const dy = (top + elHeight/2) - cy;
+          const dist = Math.hypot(dx,dy);
+
+          // aceita se suficientemente longe do cursor or near edge (para "fora do alcance")
+          if(dist >= minDist || left < padding || left > vw - elWidth - padding - 1 || top < padding || top > vh - elHeight - padding - 1){
+            return {left, top};
+          }
+        }
+
+        // fallback: joga pro canto oposto
+        const fallbackLeft = cx < vw/2 ? vw - elWidth - padding : padding;
+        const fallbackTop  = cy < vh/2 ? vh - elHeight - padding : padding;
+        return {left: fallbackLeft, top: fallbackTop};
+      }
+
+      // Toca o som de teleporte (só após interação do usuário, browsers bloqueiam autoplay)
+      function playTeleportSound(){
+        if(!audio) return;
+        audio.currentTime = 0;
+        const playPromise = audio.play();
+        if(playPromise && playPromise.catch){
+          playPromise.catch(()=>{ /* se bloqueado, nada faz */ });
+        }
+      }
+
+      // tenta vibrar (apenas se suportado)
+      function tryVibrate(){
+        try{
+          if(navigator.vibrate) navigator.vibrate([40,20,40]);
+        }catch(e){}
+      }
+
+      // função que move o botão para uma posição nova e segura
+      function teleportAway(clientX = window.innerWidth/2, clientY = window.innerHeight/2){
+        const rect = regBtn.getBoundingClientRect();
+        const elW = rect.width;
+        const elH = rect.height;
+        const pos = randomPositionAway(clientX, clientY, elW, elH);
+
+        // posiciona com animação (CSS transition)
+        regBtn.style.left = pos.left + 'px';
+        regBtn.style.top  = pos.top + 'px';
+      }
+
+      // Ao tentar clicar (pointerdown) no botão: previne clique, teleporta e toca som
+      regBtn.addEventListener('pointerdown', function(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
+
+        // reproduzir som e vibrar
+        playTeleportSound();
+        tryVibrate();
+
+        // teleporta para longe
+        teleportAway(evt.clientX, evt.clientY);
+
+        // para evitar que o usuário segure e arraste por cima do elemento, tiramos o focus rapidamente
+        regBtn.blur();
+      }, {passive:false});
+
+      // Também se o mouse se aproximar (hover), a Regina se esquiva (opcional)
+      area.addEventListener('mousemove', function(evt){
+        const r = regBtn.getBoundingClientRect();
+        const dx = evt.clientX - (r.left + r.width/2);
+        const dy = evt.clientY - (r.top  + r.height/2);
+        const dist = Math.hypot(dx,dy);
+
+        // se o cursor se aproximar demais, "teleporta" automaticamente
+        if(dist < Math.max(120, Math.min(window.innerWidth, window.innerHeight) * 0.12)){
+          playTeleportSound();
+          teleportAway(evt.clientX, evt.clientY);
+        }
+      }, {passive:true});
+
+      // Em touch devices, reage ao toque inicial na área (touchstart)
+      area.addEventListener('touchstart', function(evt){
+        if(!evt.touches || evt.touches.length===0) return;
+        const t = evt.touches[0];
+        const r = regBtn.getBoundingClientRect();
+        const dx = t.clientX - (r.left + r.width/2);
+        const dy = t.clientY - (r.top  + r.height/2);
+        const dist = Math.hypot(dx,dy);
+        if(dist < 160){
+          playTeleportSound();
+          teleportAway(t.clientX, t.clientY);
+          tryVibrate();
+        }
+      }, {passive:true});
+
+      // se por algum motivo o botão for clicado (ex: teclado), evitamos ação e teleportamos
+      regBtn.addEventListener('click', function(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
+        playTeleportSound();
+        teleportAway(window.innerWidth/2, window.innerHeight/2);
+      });
+
+      // reposiciona ao redimensionar
+      window.addEventListener('resize', function(){
+        setTimeout(placeInitial, 120);
+      });
+
+      // coloca inicialmente após carregar para pegar medidas
+      window.addEventListener('load', function(){
+        placeInitial();
+      });
+
+      // acessibilidade: permitir foco via teclado mas quando focado, ao tentar ativar (Enter/Space) teleporta
+      regBtn.addEventListener('keydown', function(evt){
+        if(evt.key === 'Enter' || evt.key === ' '){
+          evt.preventDefault();
+          playTeleportSound();
+          teleportAway(window.innerWidth/2, window.innerHeight/2);
+        }
+      });
+
+      // prevenir seleção arrastando
+      regBtn.addEventListener('dragstart', e => e.preventDefault());
+    })();
+  </script>
+</body>
+</html>
